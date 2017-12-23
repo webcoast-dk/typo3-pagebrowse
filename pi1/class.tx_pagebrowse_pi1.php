@@ -25,12 +25,17 @@
 *  This copyright notice MUST APPEAR in all copies of the script!
 ***************************************************************/
 
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Utility\MathUtility;
+use TYPO3\CMS\Frontend\Plugin\AbstractPlugin;
+
 /**
  * This class implements page browser plugin
  *
  * @author	Dmitry Dulepov [netcreators] <dmitry@typo3.org>
  */
-class tx_pagebrowse_pi1 extends tslib_pibase {
+class tx_pagebrowse_pi1 extends AbstractPlugin {
 	// Default plugin variables:
 	public $prefixId = 'tx_pagebrowse_pi1';
 	public $scriptRelPath = 'pi1/class.tx_pagebrowse_pi1.php';
@@ -85,7 +90,7 @@ class tx_pagebrowse_pi1 extends tslib_pibase {
 				$params = array(
 					'pObj' => &$this,
 				);
-				t3lib_div::callUserFunction($userFunc, $params, $this);
+				GeneralUtility::callUserFunction($userFunc, $params, $this);
 			}
 		}
 
@@ -95,22 +100,22 @@ class tx_pagebrowse_pi1 extends tslib_pibase {
 			$this->currentPage = max(0, intval($this->piVars['page']));
 		}
 		else {
-			$parts = t3lib_div::trimExplode('|', $pageParameterName, 2);
+			$parts = GeneralUtility::trimExplode('|', $pageParameterName, 2);
 			if (count($parts) == 2) {
 				$this->pageParameterName = $parts[0] . '[' . $parts[1] . ']';
-				$vars = t3lib_div::_GP($parts[0]);
+				$vars = GeneralUtility::_GP($parts[0]);
 				$this->currentPage = max(0, intval($vars[$parts[1]]));
 			}
 			else {
 				$this->pageParameterName = $pageParameterName;
-				$this->currentPage = max(0, intval(t3lib_div::_GP($pageParameterName)));
+				$this->currentPage = max(0, intval(GeneralUtility::_GP($pageParameterName)));
 			}
 		}
 
-		if (self::testInt($this->conf['pagesBefore'])) {
+		if (MathUtility::canBeInterpretedAsInteger($this->conf['pagesBefore'])) {
 			$this->pagesBefore = intval($this->conf['pagesBefore']);
 		}
-		if (self::testInt($this->conf['pagesAfter'])) {
+		if (MathUtility::canBeInterpretedAsInteger($this->conf['pagesAfter'])) {
 			$this->pagesAfter = intval($this->conf['pagesAfter']);
 		}
 
@@ -124,7 +129,7 @@ class tx_pagebrowse_pi1 extends tslib_pibase {
 				$params = array(
 					'pObj' => &$this,
 				);
-				t3lib_div::callUserFunction($userFunc, $params, $this);
+				GeneralUtility::callUserFunction($userFunc, $params, $this);
 			}
 		}
 
@@ -176,7 +181,7 @@ class tx_pagebrowse_pi1 extends tslib_pibase {
 			$GLOBALS['TSFE']->additionalHeaderData[$key] =
 				$this->cObj->substituteMarkerArray($subPart, array(
 					'###SITE_REL_PATH###' => $GLOBALS['TSFE']->config['config']['absRefPrefix'] .
-						t3lib_extMgm::siteRelPath($this->extKey),
+						ExtensionManagementUtility::siteRelPath($this->extKey),
 				));
 		}
 	}
@@ -254,7 +259,7 @@ class tx_pagebrowse_pi1 extends tslib_pibase {
 							'page' => $i,
 							'pObj' => &$this
 						);
-						t3lib_div::callUserFunction($userFunc, $params, $this);
+						GeneralUtility::callUserFunction($userFunc, $params, $this);
 					}
 				}
 				$pageLinks .= $this->cObj->substituteMarkerArray($template, $localMarkers);
@@ -282,7 +287,7 @@ class tx_pagebrowse_pi1 extends tslib_pibase {
 						'pObj' => &$this,
 						'subparts' => &$subPartMarkers
 					);
-					t3lib_div::callUserFunction($userFunc, $params, $this);
+					GeneralUtility::callUserFunction($userFunc, $params, $this);
 				}
 			}
 
@@ -336,7 +341,7 @@ class tx_pagebrowse_pi1 extends tslib_pibase {
 					'pageType' => $pageType,
 					'pageNumber' => $page,
 				);
-				$additionalParams = t3lib_div::callUserFunction($userFunc, $params, $this);
+				$additionalParams = GeneralUtility::callUserFunction($userFunc, $params, $this);
 			}
 		}
 		// Assemble typolink configuration
@@ -346,23 +351,6 @@ class tx_pagebrowse_pi1 extends tslib_pibase {
 			'useCacheHash' => (strlen($additionalParams) > 1) && !$this->conf['disableCacheHash'],
 		);
 		return htmlspecialchars($this->cObj->typoLink_URL($conf));
-	}
-
-	/**
-	 * Tests if the value can be interpreted as integer.
-	 *
-	 * @param mixed $value
-	 * @return bool
-	 */
-	static protected function testInt($value) {
-		if (class_exists('\\TYPO3\\CMS\\Core\\Utility\\MathUtility')) {
-			$result = \TYPO3\CMS\Core\Utility\MathUtility::canBeInterpretedAsInteger($value);
-		} elseif (class_exists('t3lib_utility_Math')) {
-			$result = t3lib_utility_Math::canBeInterpretedAsInteger($value);
-		} else {
-			$result = t3lib_div::testInt($value);
-		}
-		return $result;
 	}
 }
 

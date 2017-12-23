@@ -1,0 +1,29 @@
+{
+	"name": "webcoast/pagebrowse",
+	"description": "Universal page browser: Provides page browsing services for extensions",
+	"autoload": {
+		"psr-4": {
+			"WEBcoast\\PageBrowse\\": "Classes/"
+		},
+		"classmap": [
+			"./pi1/"
+		]
+	},
+	"type": "typo3-cms-extension",
+    "license": "GPL-3.0",
+	"authors": [
+		{
+			"name": "Thorben Nissen",
+			"email": "thorben@work.de"
+		}
+	],
+	"extra": {
+		"branch-alias": {
+			"dev-master": "1.4.x-dev"
+		}
+	},
+	"require": {
+		"typo3/cms": "^7.6.0"
+	},
+	"minimum-stability": "dev"
+}
