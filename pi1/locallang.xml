@@ -19,5 +19,12 @@
 			<label index="tt_content.tx_pagebrowse_pi1.pageParamName">Page parameter name:</label>
 			<label index="tt_content.tx_pagebrowse_pi1.templateFile">Template file:</label>
 		</languageKey>
+
+		<languageKey index="de" type="array">
+			<label index="text_first">&lt;&lt;Erste</label>
+			<label index="text_prev">&lt;Vorherige</label>
+			<label index="text_next">Nächste&gt;</label>
+			<label index="text_last">Letzte&gt;&gt;</label>
+		</languageKey>
 	</data>
 </T3locallang>
