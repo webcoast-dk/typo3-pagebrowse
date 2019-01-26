@@ -121,7 +121,7 @@ class tx_pagebrowse_pi1 extends AbstractPlugin {
 
 		$this->adjustForForcedNumberOfLinks();
 
-		$this->templateCode = $this->cObj->fileResource($this->conf['templateFile']);
+		$this->templateCode = file_get_contents(GeneralUtility::getFileAbsFileName($this->conf['templateFile']));
 
 		// Call post-init hook
 		if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF'][$this->extKey]['postInit'])) {
@@ -175,11 +175,11 @@ class tx_pagebrowse_pi1 extends AbstractPlugin {
 	 * @return	void
 	 */
 	protected function addHeaderParts() {
-		$subPart = $this->cObj->getSubpart($this->templateCode, '###HEADER_ADDITIONS###');
+		$subPart = $this->templateService->getSubpart($this->templateCode, '###HEADER_ADDITIONS###');
 		$key = $this->prefixId . '_' . md5($subPart);
 		if (!isset($GLOBALS['TSFE']->additionalHeaderData[$key])) {
 			$GLOBALS['TSFE']->additionalHeaderData[$key] =
-				$this->cObj->substituteMarkerArray($subPart, array(
+				$this->templateService->substituteMarkerArray($subPart, array(
 					'###SITE_REL_PATH###' => $GLOBALS['TSFE']->config['config']['absRefPrefix'] .
 						ExtensionManagementUtility::siteRelPath($this->extKey),
 				));
@@ -202,7 +202,7 @@ class tx_pagebrowse_pi1 extends AbstractPlugin {
 				'###TEXT_LAST###' => htmlspecialchars($this->pi_getLL('text_last')),
 			);
 			$subPartMarkers = array();
-			$subPart = $this->cObj->getSubpart($this->templateCode, '###PAGE_BROWSER###');
+			$subPart = $this->templateService->getSubpart($this->templateCode, '###PAGE_BROWSER###');
 
 			// First page link
 			if ($this->currentPage == 0) {
@@ -238,8 +238,8 @@ class tx_pagebrowse_pi1 extends AbstractPlugin {
 			}
 
 			// Page links
-			$actPageLinkSubPart = trim($this->cObj->getSubpart($subPart, '###CURRENT###'));
-			$inactPageLinkSubPart = trim($this->cObj->getSubpart($subPart, '###PAGE###'));
+			$actPageLinkSubPart = trim($this->templateService->getSubpart($subPart, '###CURRENT###'));
+			$inactPageLinkSubPart = trim($this->templateService->getSubpart($subPart, '###PAGE###'));
 			$pageLinks = '';
 			$start = max($this->currentPage - $this->pagesBefore, 0);
 			$end = min($this->numberOfPages, $this->currentPage + $this->pagesAfter + 1);
@@ -262,7 +262,7 @@ class tx_pagebrowse_pi1 extends AbstractPlugin {
 						GeneralUtility::callUserFunction($userFunc, $params, $this);
 					}
 				}
-				$pageLinks .= $this->cObj->substituteMarkerArray($template, $localMarkers);
+				$pageLinks .= $this->templateService->substituteMarkerArray($template, $localMarkers);
 			}
 			$subPartMarkers['###PAGE###'] = $pageLinks;
 			$subPartMarkers['###CURRENT###'] = '';
@@ -292,7 +292,7 @@ class tx_pagebrowse_pi1 extends AbstractPlugin {
 			}
 
 			// Compile all together
-			$out = $this->cObj->substituteMarkerArrayCached($subPart, $markers, $subPartMarkers);
+			$out = $this->templateService->substituteMarkerArrayCached($subPart, $markers, $subPartMarkers);
 			// Remove all comments
 			$out = preg_replace('/<!--\s*###.*?-->/', ' ', $out);
 			// Remove excessive spacing
